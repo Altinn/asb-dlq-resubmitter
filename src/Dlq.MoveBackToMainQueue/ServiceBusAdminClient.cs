@@ -11,10 +11,4 @@ public class ServiceBusAdminClient(string connectionString)
         var runtimeProperties = await adminClient.GetQueueRuntimePropertiesAsync(queueName);
         return (int)runtimeProperties.Value.DeadLetterMessageCount;
     }
-    
-    public async Task<int> GetSubscriptionDeadLetterMessageCountAsync(string topicName, string subscriptionName)
-    {
-        var runtimeProperties = await adminClient.GetSubscriptionRuntimePropertiesAsync(topicName, subscriptionName);
-        return (int)runtimeProperties.Value.DeadLetterMessageCount;
-    } 
 }

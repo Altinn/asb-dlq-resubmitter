@@ -30,6 +30,11 @@ public class ConsoleUI(CommandLineArgumentsParser.ArgumentParsingResult argument
         Console.WriteLine($"{arguments.MaxConcurrency}");
         
         Console.ForegroundColor = ConsoleColor.White;
+        Console.Write("Max Replay Attempts: ");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"{arguments.MaxReplayAttempts}");
+        
+        Console.ForegroundColor = ConsoleColor.White;
         Console.Write("Start Time: ");
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"{startTime:dd-MM-yyyy HH:mm:ss}");
@@ -179,6 +184,7 @@ public class ConsoleUI(CommandLineArgumentsParser.ArgumentParsingResult argument
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"  -mc <max-concurrency>        Maximum number of concurrent operations (default: {Constants.DefaultMaxConcurrency}, max: {Constants.MaxAllowedConcurrency})");
         Console.WriteLine($"  -i  <identifier>             A property used to set the ServiceBusReceiver ID to identify the client. If null or empty, a random unique value will be used. (default: {Constants.DefaultIdentifier})");
+        Console.WriteLine($"  -mr <max-replays>            Maximum number of times to resubmit a previously dead-lettered message (default: {Constants.DefaultMaxReplayAttempts}, max: {Constants.MaxAllowedReplayAttempts})");
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("Help:");

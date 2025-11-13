@@ -8,7 +8,7 @@ if (arguments.ShowHelp)
 }
 
 var sbAdminClient = new ServiceBusAdminClient(arguments.ServiceBusConnectionString!);
-var totalNumberOfDeadLetterMessages = await sbAdminClient.GetSubscriptionDeadLetterMessageCountAsync("legacy", arguments.QueueName!);
+var totalNumberOfDeadLetterMessages = await sbAdminClient.GetDeadLetterMessageCountAsync(arguments.QueueName!);
 
 var consoleUI = new ConsoleUI(arguments, totalNumberOfDeadLetterMessages);
 consoleUI.PrintHeader();
@@ -42,7 +42,11 @@ try
             {
                 try
                 {
-                    var mover = new DeadLetterMessageMover(arguments.ServiceBusConnectionString!, arguments.QueueName!, arguments.Identifier);
+                    var mover = new DeadLetterMessageMover(
+                        arguments.ServiceBusConnectionString!,
+                        arguments.QueueName!,
+                        arguments.Identifier,
+                        arguments.MaxReplayAttempts);
                     await foreach (var result in mover.MoveMessagesAsync(cts.Token))
                     {
                         if (result.IsSuccess)
