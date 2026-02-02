@@ -46,7 +46,8 @@ try
                         arguments.ServiceBusConnectionString!,
                         arguments.QueueName!,
                         arguments.Identifier,
-                        arguments.MaxReplayAttempts);
+                        arguments.MaxReplayAttempts,
+                        arguments.RemoveExhaustedMessages);
                     await foreach (var result in mover.MoveMessagesAsync(cts.Token))
                     {
                         if (result.IsSuccess)

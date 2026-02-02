@@ -5,10 +5,16 @@ using FluentResults;
 
 namespace Cjoergensen.Azure.ServiceBus.Tools.Dlq.MoveBackToMainQueue;
 
-public class DeadLetterMessageMover(string connectionString, string queueName, string identifier = "", int maxReplayAttempts = Constants.DefaultMaxReplayAttempts)
+public class DeadLetterMessageMover(
+    string connectionString,
+    string queueName,
+    string identifier = "",
+    int maxReplayAttempts = Constants.DefaultMaxReplayAttempts,
+    bool removeExhaustedMessages = false)
 {
     private readonly ServiceBusClient client = new(connectionString);
     private readonly int maxReplayAttempts = maxReplayAttempts;
+    private readonly bool removeExhaustedMessages = removeExhaustedMessages;
     private readonly HashSet<string> exhaustedMessageIds = new();
 
     public async IAsyncEnumerable<FluentResults.Result> MoveMessagesAsync([EnumeratorCancellation] CancellationToken cancellationToken)
@@ -40,10 +46,20 @@ public class DeadLetterMessageMover(string connectionString, string queueName, s
                     var messageIdentifier = GetMessageIdentifier(msg);
                     if (exhaustedMessageIds.Add(messageIdentifier))
                     {
-                        yield return Result.Fail($"Replay limit reached for message: {messageIdentifier} (attempts: {currentReplayCount}). Message left in DLQ.");
+                        var actionText = removeExhaustedMessages
+                            ? "Message removed from DLQ to prevent blocking."
+                            : "Message left in DLQ.";
+                        yield return Result.Fail($"Replay limit reached for message: {messageIdentifier} (attempts: {currentReplayCount}). {actionText}");
                     }
-                    
-                    await receiver.AbandonMessageAsync(msg, cancellationToken: cancellationToken);
+
+                    if (removeExhaustedMessages)
+                    {
+                        await receiver.CompleteMessageAsync(msg, cancellationToken);
+                    }
+                    else
+                    {
+                        await receiver.AbandonMessageAsync(msg, cancellationToken: cancellationToken);
+                    }
                     continue;
                 }
                 

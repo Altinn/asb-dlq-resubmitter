@@ -11,6 +11,7 @@ public static class CommandLineArgumentsParser
         public int MaxConcurrency { get; init; }
         public string Identifier { get; init; } = "";
         public int MaxReplayAttempts { get; init; }
+        public bool RemoveExhaustedMessages { get; init; }
     }
 
     public static ArgumentParsingResult ParseArguments(string[] args)
@@ -25,6 +26,7 @@ public static class CommandLineArgumentsParser
         var queueName = string.Empty;
         var maxConcurrency = Constants.DefaultMaxConcurrency;
         var maxReplayAttempts = Constants.DefaultMaxReplayAttempts;
+        var removeExhaustedMessages = false;
         string? providedIdentifier = null;
 
         try
@@ -47,6 +49,10 @@ public static class CommandLineArgumentsParser
                         break;
                     case "-mr" when i + 1 < args.Length:
                         maxReplayAttempts = int.Parse(args[++i]);
+                        break;
+                    case "-re":
+                    case "--remove-exhausted":
+                        removeExhaustedMessages = true;
                         break;
                 }
             }
@@ -71,7 +77,8 @@ public static class CommandLineArgumentsParser
             QueueName = queueName,
             MaxConcurrency = maxConcurrency,
             Identifier = identifier,
-            MaxReplayAttempts = maxReplayAttempts
+            MaxReplayAttempts = maxReplayAttempts,
+            RemoveExhaustedMessages = removeExhaustedMessages
         };
     }
     
