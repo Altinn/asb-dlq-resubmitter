@@ -4,6 +4,9 @@ on:
   push:
     branches-ignore: [main]
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     name: Build and test
